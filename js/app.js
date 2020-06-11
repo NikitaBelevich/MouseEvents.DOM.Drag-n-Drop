@@ -127,3 +127,85 @@ sliderRange.addEventListener('mousedown', function(event) {
 });
 
 // TODO Task 1 
+
+// TODO Task 2
+
+const containerField = document.querySelector('.task2 .container-drag-n-drop');
+
+containerField.ondragstart = () => false;
+
+document.addEventListener('mousedown', (event) => {
+    const targetDragImg = event.target.closest('.draggable');
+    if (!targetDragImg) return false; // если это элемент без класса draggable, т.е неперетаскиваемый, то выходим
+
+    const elementsFieldCoordinates = targetDragImg.getBoundingClientRect(); // получим координаты элемента
+    // вычисленные координаты захвата элемента, для того, чтобы элемент не центрировался относительно курсора при захвате
+    const shiftX = event.clientX - elementsFieldCoordinates.left; 
+    const shiftY = event.clientY - elementsFieldCoordinates.top;
+    // координата до курсора минус координата У до нижней границы элемента
+    const shiftYBottom = event.clientY - elementsFieldCoordinates.bottom;
+    const widthWindow = document.documentElement.offsetWidth;
+    const heightWindow = document.documentElement.clientHeight;
+
+    // даём фиксированное позиционирование (относительно окна браузера)
+    targetDragImg.style.position = 'fixed'; 
+    targetDragImg.style.top = event.clientY - shiftY + 'px'; // начальная координата по Y
+    // targetDragImg.style.zIndex = 1000;
+    function onMouseMove(event) {
+        const elementsFieldCoordinates = targetDragImg.getBoundingClientRect();
+        const pageX = event.pageX;
+        const pageY = event.pageY;
+        const clientX = event.clientX;
+        const clientY = event.clientY;
+
+        // TODO обрабатываем координату X перетаскиваемого элемента
+        let borderDraggingX = clientX - shiftX;
+        if (borderDraggingX <= 5) { // левая граница окна для элемента
+            borderDraggingX = 5;
+        }
+        // ширина окна без учёта ширины drag элемента
+        let rightBorderWindow = document.documentElement.offsetWidth - targetDragImg.offsetWidth;
+        if (borderDraggingX >= rightBorderWindow - 5) {
+            borderDraggingX = rightBorderWindow - 5;
+        }
+        // TODO обрабатываем координату X перетаскиваемого элемента
+        
+        // TODO обрабатываем координату Y перетаскиваемого элемента
+        let borderDraggingY = clientY - shiftY;
+        // высота нашего экрана минус высота drag элемента
+        let topBorderWindow = document.documentElement.clientHeight - targetDragImg.offsetHeight;
+        // если верхняя граница элемента + отступ 5px выходит за пределы экрана вверх
+        if (borderDraggingY <= 5) {
+            // тогда фиксируем картинку сверху с небольшим отступом
+            borderDraggingY = 5;
+            // и прокручиваем документ вверх с тем учётом, что у нас прокрутка начнётся когда верхний край элемента достигнет верха окна
+            window.scrollBy(0, clientY - shiftY);
+        }
+        // нижняя граница окна с учётом расстояние от захвата до нижней границы элемента
+        let bottomBorderDraggingY = clientY - shiftYBottom;
+        // когда нижний край элемента выходит на нижний край окна с учётом отступа, то элемент прижимаем к низу и даём небольшой отступ
+        if (bottomBorderDraggingY >= heightWindow - 5) {
+            borderDraggingY = (heightWindow - targetDragImg.offsetHeight) - 5;
+            // прокручиваем вниз когда элемент выходит за нижнюю границу окна, вычтя высоту окна мы получим на сколько пикселей  элемент вышел вниз, на эти значения и прокручиваем страницу.
+            window.scrollBy(0, bottomBorderDraggingY - heightWindow);
+        }
+        // TODO обрабатываем координату Y перетаскиваемого элемента
+
+        // позиционируем наших героев и мяч
+        targetDragImg.style.left = borderDraggingX + 'px';
+        targetDragImg.style.top = borderDraggingY + 'px';
+    }
+
+    // перемещать по экрану
+    document.addEventListener('mousemove', onMouseMove);
+    // положить мяч, удалить более ненужные обработчики событий
+    document.onmouseup = function () {
+        // ставим элементу координаты которые у него есть + высота прокрутки, т.к теперь позиционируем абсолютно документу
+        targetDragImg.style.top = parseInt(targetDragImg.style.top) + pageYOffset + 'px';
+        targetDragImg.style.position = 'absolute';
+        this.removeEventListener('mousemove', onMouseMove);
+        this.onmouseup = null;
+    };
+});
+
+// TODO Task 2

@@ -47,3 +47,7 @@ input[type="number"] {
   border-radius: 4px;
   cursor: pointer;
 }
+
+.set-heroes {
+  margin-top: 15px;
+}
