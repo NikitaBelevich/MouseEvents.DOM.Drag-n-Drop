@@ -209,3 +209,70 @@ document.addEventListener('mousedown', (event) => {
 });
 
 // TODO Task 2
+
+// TODO Task 3
+
+let browDragParent = document.querySelector('.task3');
+let browElem = browDragParent.querySelector('.drag-elem-child');
+let parentElem = browDragParent.querySelector('.drag-elem-parent');
+
+// Поведение drag элемента
+// Не забываем прописать атрибут draggable="true" 
+// Drag элемент взят
+browElem.addEventListener('dragstart', function(e) {
+    
+    this.style.borderColor = 'coral';
+    // this.style.cursor = '-webkit-grabbing';
+
+    // Запоминаем сдвиг курсора при захвате
+    let offsetX = e.offsetX;
+    let offsetY = e.offsetY;
+
+    // Элемент перетаскивается (mousemove)
+    this.addEventListener('drag', function(e) {
+        console.log('!');
+    });
+
+    // Элемент отпускается
+    // Если было начало перетаскивания, то в любом случае будет его окончание
+    this.addEventListener('dragend', function(e) { 
+        this.style.borderColor = 'green';
+        // позиционируем
+        const pageX = e.pageX;
+        const pageY = e.pageY;
+        // позиционируем с учётом позции курсора при захвате
+        this.style.cssText = `
+                            position: absolute;
+                            left: ${pageX - offsetX - 2}px;
+                            top: ${pageY - offsetY - 2}px;
+        `;
+
+    });
+});
+
+// Поведение принимающего элемента
+// Элемент заходит на принимающий
+parentElem.addEventListener('dragenter', function(e) {
+    const firstContent = this.textContent; // для запоминания изначального контента
+    this.textContent = '!!!';
+    this.classList.add('parent-focus'); // добавили класс со стилизацией
+
+    // Элемент находится в принимающем элементе
+    this.addEventListener('dragover', function(e) {
+        e.preventDefault(); // обязательное действие для работа drop!
+    });
+
+    // Элемент покидает принимающий 
+    this.addEventListener('dragleave', function(e) {
+        this.classList.remove('parent-focus'); // Удаляем стилизацию если элемент ушёл
+        this.textContent = firstContent;
+    });
+
+    // Элемент сброшен на принимающий
+    this.addEventListener('drop', function(e) {
+        this.classList.remove('parent-focus'); // Удаляем стилизацию если элемент сброшен
+        this.textContent = firstContent;
+    });
+});
+
+// TODO Task 3
